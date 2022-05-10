@@ -6,7 +6,7 @@ jobs:
     name: Preview
     runs-on: ubuntu-latest
     steps:
-      - run: npm install
+      - run: mix deps.get
       - uses: pulumi/actions@v3
         with:
           command: preview
