@@ -6,10 +6,27 @@ jobs:
     name: Preview
     runs-on: ubuntu-latest
     steps:
-      - run: npm install
       - uses: pulumi/actions@v3
+      - name: Set up Elixir
+        uses: erlef/setup-beam@988e02bfe678367a02564f65ca2e37726dc0268f
         with:
-          command: preview
-          stack-name: dev
-        env:
-          PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
+          elixir-version: ${{ matrix.elixir }} # Define the elixir version [required]
+          otp-version: ${{ matrix.otp }} # Define the OTP version [required]
+      - name: Restore dependencies cache
+        uses: actions/cache@v3
+        with:
+          path: deps
+          key: ${{ runner.os }}-mix-${{ hashFiles('**/mix.lock') }}
+          restore-keys: ${{ runner.os }}-mix-
+      - name: Install dependencies
+        run: mix deps.get
+      - name: Check Formatting
+        run: mix format --check-formatted
+      - name: Run Credo
+        run: mix credo --strict
+      - uses: pulumi/actions@v3
+          with:
+            command: preview
+            stack-name: dev
+          env:
+            PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
