@@ -6,6 +6,7 @@ jobs:
     name: Preview
     runs-on: ubuntu-latest
     steps:
+      - run: cd kv
       - run: mix deps.get
       - uses: pulumi/actions@v3
         with:
